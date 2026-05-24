@@ -1,0 +1,33 @@
+name: Unmask CI
+
+# Le CI se lance à chaque fois qu'on pousse du code ou qu'on fait une Pull Request vers main
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Récupérer le code
+      uses: actions/checkout@v3
+
+    - name: Configurer Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Installer les dépendances backend
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        # S'il y a un fichier requirements, on l'installe
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Vérifier la syntaxe (Linting basique)
+      run: |
+        # Vérifie que le code Python compile sans erreur fatale
+        python -m compileall backend/app/
